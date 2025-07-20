@@ -13,7 +13,25 @@
         disabled: {{ isset($attributes['disabled']) ? 'true':'false' }},
         limit: {{ $limit }},
     })"
-    x-init="init()"
+    x-init="init();
+    $watch('open', value => {
+        if (value) {
+            if (selected && (multiple ? selected.length > 0 : selected)) {
+                $nextTick(() => $refs.searchInput.focus());
+            }
+    
+            const keys = Object.keys(options);
+            if (!multiple && selected) {
+                const index = keys.indexOf(String(selected));
+                if (index >= 0) currentIndex = index;
+            }
+    
+            if (multiple && selected.length > 0) {
+                const index = keys.indexOf(String(selected[selected.length - 1]));
+                if (index >= 0) currentIndex = index;
+            }
+        }
+    });"
     @click.away="closeSelect()"
     @keydown.escape="closeSelect()"
     @keydown.arrow-down.prevent="increaseIndex()"
